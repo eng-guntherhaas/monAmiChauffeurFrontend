@@ -12,10 +12,13 @@ import FormControlLabel from "@mui/material/FormControlLabel";
 import FormGroup from "@mui/material/FormGroup";
 import MenuItem from "@mui/material/MenuItem";
 import Menu from "@mui/material/Menu";
+import { useRouter } from "next/navigation";
 
 export default function Navbar() {
   const [auth, setAuth] = React.useState(false);
   const [anchorEl, setAnchorEl] = React.useState(null);
+
+  const router = useRouter();
 
   const handleChange = (event) => {
     setAuth(event.target.checked);
@@ -25,8 +28,22 @@ export default function Navbar() {
     setAnchorEl(event.currentTarget);
   };
 
-  const handleClose = () => {
+  const handleClose = (e) => {
     setAnchorEl(null);
+
+    const path = e.target.innerText.toLowerCase();
+
+    const destinations = {
+      inscription: "/signup",
+
+      connexion: "/signin",
+    };
+
+    const destination = destinations[path];
+
+    if (destination) {
+      router.push(destination);
+    }
   };
 
   return (
@@ -85,8 +102,12 @@ export default function Navbar() {
             >
               {auth ? (
                 <>
-                  <MenuItem onClick={handleClose}>Profile</MenuItem>
-                  <MenuItem onClick={handleClose}>My account</MenuItem>
+                  <MenuItem value="profile" onClick={handleClose}>
+                    Profile
+                  </MenuItem>
+                  <MenuItem value="account" onClick={handleClose}>
+                    My account
+                  </MenuItem>
                 </>
               ) : (
                 <>
