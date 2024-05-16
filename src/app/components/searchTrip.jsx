@@ -1,7 +1,4 @@
-import { Button, Grid } from "@mui/material";
-import InputFieldText from "./inputFieldText";
-import InputFieldNumber from "./inputFieldNumber";
-import InputFieldDate from "./inputFieldDate";
+import { Button, Grid, TextField } from "@mui/material";
 
 export default function SearchTrip() {
   return (
@@ -13,16 +10,16 @@ export default function SearchTrip() {
         spacing={2}
       >
         <Grid xs={12} sm={2}>
-          <InputFieldText label="Départ" required={true} />
+          <TextField label="Départ" required={true} />
         </Grid>
         <Grid xs={12} sm={2}>
-          <InputFieldText label="Destination" required={true} />
+          <TextField label="Destination" required={true} />
         </Grid>
         <Grid xs={12} sm={2}>
-          <InputFieldNumber label="Passager" required={true} />
+          <TextField label="Passager" required={true} />
         </Grid>
         <Grid xs={12} sm={2}>
-          <InputFieldDate label="Date" required={true} />
+          <TextField label="Date" required={true} />
         </Grid>
         <Grid xs={12} sm={2}>
           <Button variant="contained">Recherche</Button>
