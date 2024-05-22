@@ -7,46 +7,100 @@ import {
   Typography,
   Box,
   FormControl,
-  FormLabel,
 } from "@mui/material";
+import OpenRouteMap from "./openRouteMap";
 
 export default function SearchTrip() {
   const [searchData, setSearchData] = useState({
     departure: "",
     destination: "",
     passenger: 1,
-    date: new Date().toISOString().split("T")[0], // Set default date to today
+    date: new Date().toISOString().split("T")[0],
   });
+
+  const [geojsonData, setGeojsonData] = useState(null);
+  const [departureSuggestions, setDepartureSuggestions] = useState([]);
+  const [destinationSuggestions, setDestinationSuggestions] = useState([]);
+  const [departureCoords, setDepartureCoords] = useState(null);
+  const [destinationCoords, setDestinationCoords] = useState(null);
 
   const handleSubmit = (e) => {
     e.preventDefault();
 
     console.log(searchData);
 
-    let request = new XMLHttpRequest();
+    // const coordStart = "8.681495,49.41461";
+    // const coordEnd = "8.687872,49.420318";
 
-    request.open(
-      "GET",
-      `https://api.openrouteservice.org/v2/directions/${modeOfTransport}?api_key=5b3ce3597851110001cf6248030ce96f26ff4570a3aba4ecaa279f8f&start=${coordStart}&end=${coordEnd}`
-    );
+    // let request = new XMLHttpRequest();
 
-    request.setRequestHeader(
-      "Accept",
-      "application/json, application/geo+json, application/gpx+xml, img/png; charset=utf-8"
-    );
+    // request.open(
+    //   "GET",
+    //   `https://api.openrouteservice.org/v2/directions/driving-car?api_key=${api_key}&start=${coordStart}&end=${coordEnd}`
+    // );
 
-    request.onreadystatechange = function () {
-      if (this.readyState === 4) {
-        console.log("Body:", this.responseText);
-      }
-    };
+    // request.setRequestHeader(
+    //   "Accept",
+    //   "application/json, application/geo+json, application/gpx+xml, img/png; charset=utf-8"
+    // );
 
-    request.send();
+    // request.onreadystatechange = function () {
+    //   if (this.readyState === 4) {
+    //     const geojsonData = JSON.parse(this.responseText);
+    //     setGeojsonData(geojsonData);
+    //   }
+    // };
+
+    // request.send();
   };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setSearchData((prevData) => ({ ...prevData, [name]: value }));
+  };
+
+  const handleInputChange = (e, type) => {
+    const { value } = e.target;
+    if (type === "departure") {
+      setSearchData((prevData) => ({ ...prevData, departure: value }));
+      getAutocompleteSuggestions(value, type);
+    } else if (type === "destination") {
+      setSearchData((prevData) => ({ ...prevData, destination: value }));
+      getAutocompleteSuggestions(value, type);
+    }
+  };
+
+  const getAutocompleteSuggestions = (input, type) => {
+    const apiUrl = `https://maps.googleapis.com/maps/api/place/autocomplete/json?key=${apiKey}&input=${input}`;
+
+    fetch(apiUrl)
+      .then((response) => response.json())
+
+      .then((data) => {
+        if (type === "departure") {
+          setDepartureSuggestions(data.predictions);
+        } else if (type === "destination") {
+          setDestinationSuggestions(data.predictions);
+        }
+      });
+  };
+
+  const handleSuggestionSelect = (suggestion, type) => {
+    if (type === "departure") {
+      setSearchData((prevData) => ({
+        ...prevData,
+        departure: suggestion.description,
+      }));
+
+      setDepartureCoords(suggestion.geometry.location);
+    } else if (type === "destination") {
+      setSearchData((prevData) => ({
+        ...prevData,
+        destination: suggestion.description,
+      }));
+
+      setDestinationCoords(suggestion.geometry.location);
+    }
   };
 
   const getPassengerLabel = () => {
@@ -71,8 +125,26 @@ export default function SearchTrip() {
               required
               name="departure"
               value={searchData.departure}
-              onChange={handleChange}
+              onChange={(e) => handleInputChange(e, "departure")}
+              onSelect={(suggestion) =>
+                handleSuggestionSelect(suggestion, "departure")
+              }
             />
+
+            {departureSuggestions.length > 0 && (
+              <ul>
+                {departureSuggestions.map((suggestion, index) => (
+                  <li
+                    key={index}
+                    onClick={() =>
+                      handleSuggestionSelect(suggestion, "departure")
+                    }
+                  >
+                    {suggestion.description}
+                  </li>
+                ))}
+              </ul>
+            )}
           </FormControl>
         </Grid>
 
@@ -83,8 +155,26 @@ export default function SearchTrip() {
               required
               name="destination"
               value={searchData.destination}
-              onChange={handleChange}
+              onChange={(e) => handleInputChange(e, "destination")}
+              onSelect={(suggestion) =>
+                handleSuggestionSelect(suggestion, "destination")
+              }
             />
+
+            {destinationSuggestions.length > 0 && (
+              <ul>
+                {destinationSuggestions.map((suggestion, index) => (
+                  <li
+                    key={index}
+                    onClick={() =>
+                      handleSuggestionSelect(suggestion, "destination")
+                    }
+                  >
+                    {suggestion.description}
+                  </li>
+                ))}
+              </ul>
+            )}
           </FormControl>
         </Grid>
 
@@ -114,13 +204,15 @@ export default function SearchTrip() {
             />
           </FormControl>
         </Grid>
-
         <Grid item xs={12} sm={2}>
           <Button type="submit" variant="contained">
             Rechercher
           </Button>
         </Grid>
       </Grid>
+      <>
+        <OpenRouteMap geojsonData={geojsonData} />
+      </>
     </Box>
   );
 }
