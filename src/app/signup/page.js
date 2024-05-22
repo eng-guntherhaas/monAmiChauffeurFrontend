@@ -12,6 +12,7 @@ import {
   Box,
 } from "@mui/material";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
+import AuthService from "../AuthService";
 
 export default function SignupPage() {
   const [user, setUser] = useState({
@@ -23,14 +24,20 @@ export default function SignupPage() {
     birthDate: new Date(),
   });
   const [showPassword, setShowPassword] = useState(false);
-
   const [passwordError, setPasswordError] = useState(null);
+  const [message, setMessage] = useState("");
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
-
-    // Call API to create or update user
-
+    try {
+      const response = await AuthService.register(user);
+      setMessage(response.data);
+      if (response.data === "Utilisateur enregistré avec succès") {
+        router.push("/signin");
+      }
+    } catch (error) {
+      setMessage("");
+    }
     console.log("Submit user:", user);
   };
 

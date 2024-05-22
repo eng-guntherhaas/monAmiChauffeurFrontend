@@ -14,11 +14,18 @@ export default function SigninPage() {
     email: "",
     password: "",
   });
-  const handleSubmit = (event) => {
+
+  const handleSubmit = async (event) => {
     event.preventDefault();
-
-    // Call API to create or update user
-
+    try {
+      const response = await AuthService.register(user);
+      setMessage(response.data);
+      if (response.data === "Connexion réussie") {
+        router.push("/");
+      }
+    } catch (error) {
+      setMessage("Informations d'identification invalides");
+    }
     console.log("Submit user:", user);
   };
 

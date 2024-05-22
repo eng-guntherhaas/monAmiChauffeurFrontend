@@ -23,7 +23,25 @@ export default function SearchTrip() {
 
     console.log(searchData);
 
-    // You can now send the searchData object to your API
+    let request = new XMLHttpRequest();
+
+    request.open(
+      "GET",
+      `https://api.openrouteservice.org/v2/directions/${modeOfTransport}?api_key=5b3ce3597851110001cf6248030ce96f26ff4570a3aba4ecaa279f8f&start=${coordStart}&end=${coordEnd}`
+    );
+
+    request.setRequestHeader(
+      "Accept",
+      "application/json, application/geo+json, application/gpx+xml, img/png; charset=utf-8"
+    );
+
+    request.onreadystatechange = function () {
+      if (this.readyState === 4) {
+        console.log("Body:", this.responseText);
+      }
+    };
+
+    request.send();
   };
 
   const handleChange = (e) => {
