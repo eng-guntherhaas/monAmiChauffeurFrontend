@@ -14,6 +14,7 @@ export default function SigninPage() {
     email: "",
     password: "",
   });
+  const [message, setMessage] = useState("");
 
   const handleSubmit = async (event) => {
     event.preventDefault();
