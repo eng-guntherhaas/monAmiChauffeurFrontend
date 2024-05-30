@@ -15,7 +15,7 @@ export default function MapComponent() {
   return (
     <>
       <div style={{ height: "50vh" }}>
-        <APIProvider apiKey={"AIzaSyDh1voMIcxgg5H3ohdamfGyPQ4hFi3mpAI"}>
+        <APIProvider apiKey={""}>
           <Map center={position} zoom={13} fullscreenControl={false}>
             <Directions />
           </Map>
